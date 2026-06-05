@@ -20,6 +20,7 @@ body {
     overflow: hidden;
     color: white;
     position: relative;
+    background: #000;
 }
 
 /* ===== 背景 ===== */
@@ -55,68 +56,95 @@ body {
 .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.2);
     z-index: 2;
 }
 
 /* ===== 柳絮 ===== */
 .catkin {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background: rgba(180, 255, 200, 0.8);
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #a8e6a8, #c8e6c9);
     border-radius: 50%;
     filter: blur(1px);
-    animation: drift 18s linear infinite;
+    opacity: 0.8;
+    animation: float 20s linear infinite;
     z-index: 3;
 }
 
-@keyframes drift {
-    0% { transform: translate(0, 100vh) rotate(0deg); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translate(200px, -100vh) rotate(720deg); opacity: 0; }
+@keyframes float {
+    0% {
+        transform: translateY(110vh) translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-10vh) translateX(100px) rotate(360deg);
+        opacity: 0;
+    }
 }
 
-/* ===== 文字 ===== */
-.text-wrapper {
+/* ===== 文字容器 ===== */
+.text-master-container {
     position: absolute;
-    top: 100%;
+    top: 0;
     left: 0;
     width: 100%;
-    display: flex;
-    justify-content: center;
+    height: 100%;
+    overflow: hidden;
     z-index: 4;
+    pointer-events: none;
 }
 
-.text-block {
+.text-scroll-container {
+    position: absolute;
+    top: 100%; /* 开始时完全在屏幕下方 */
+    left: 0;
+    width: 100%;
+    transition: top 120s linear; /* 更慢的滑动速度 */
+}
+
+.text-content {
     max-width: 900px;
-    font-size: 1.8rem;
-    line-height: 2.2;
-    letter-spacing: 0.08em;
-    text-align: center;
-    text-shadow:
-        2px 2px 6px rgba(0,0,0,0.7),
-        -1px -1px 3px rgba(255,255,255,0.3);
+    margin: 0 auto;
     padding: 20px;
+    text-align: center;
 }
 
-.text-block p {
+.text-line {
+    font-size: 2rem;
+    line-height: 2.5;
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-shadow: 
+        2px 2px 6px rgba(0, 0, 0, 0.8),
+        -1px -1px 3px rgba(255, 255, 255, 0.3);
     opacity: 0;
-    transform: translateY(40px);
-    transition: all 1.2s ease;
-    margin-bottom: 15px;
+    transform: translateY(20px);
+    transition: all 2s ease;
+    margin-bottom: 40px; /* 更大的行间距 */
+    min-height: 80px; /* 确保每行有足够高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
 }
 
-.text-block p.show {
+.text-line.show {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* 文本上滑动画 */
-@keyframes slideUp {
-    from { transform: translateY(0); }
-    to { transform: translateY(-3000px); } /* 足够长的距离确保完全滑出 */
+/* 确保文字在每张背景开始时都从屏幕最下方出现 */
+.text-line.entering {
+    position: relative;
+    top: calc(100vh - 100px); /* 从屏幕底部开始 */
 }
 
 /* ===== 图标按钮 ===== */
@@ -139,63 +167,92 @@ body {
 
 .coffee-btn {
     position: absolute;
-    width: 130px;
-    height: 130px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.25);
-    backdrop-filter: blur(8px);
-    border: 2px solid rgba(255,255,255,0.6);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    border: 3px solid rgba(255, 255, 255, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.3s;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    transition: all 0.4s ease;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .coffee-btn:hover {
-    transform: scale(1.15);
-    background: rgba(255,255,255,0.35);
+    transform: translate(-50%, -50%) scale(1.15);
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.4),
+        inset 0 2px 15px rgba(255, 255, 255, 0.3);
 }
 
 .lock-btn {
     position: absolute;
-    bottom: 50px;
-    right: 50px;
-    width: 110px;
-    height: 110px;
+    bottom: 60px;
+    right: 60px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.25);
-    backdrop-filter: blur(8px);
-    border: 2px solid rgba(255,255,255,0.6);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    border: 3px solid rgba(255, 255, 255, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.3s;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    transition: all 0.4s ease;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 2px 10px rgba(255, 255, 255, 0.2);
 }
 
 .lock-btn:hover {
     transform: scale(1.15);
-    background: rgba(255,255,255,0.35);
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.4),
+        inset 0 2px 15px rgba(255, 255, 255, 0.3);
 }
 
-/* 咖啡图标 */
+/* 咖啡图标 - 45度俯视角 */
 .coffee-icon {
     position: relative;
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
+    transform: rotate(45deg) perspective(300px) rotateX(10deg);
+}
+
+.coffee-saucer {
+    position: absolute;
+    width: 100px;
+    height: 25px;
+    background: linear-gradient(145deg, #f8f8f8, #e0e0e0);
+    border-radius: 50%;
+    bottom: 5px;
+    left: -10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .coffee-cup {
-    width: 60px;
-    height: 50px;
+    position: absolute;
+    width: 70px;
+    height: 60px;
     background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    border-radius: 8px 8px 20px 20px;
-    position: relative;
-    transform: rotate(-5deg);
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    border-radius: 5px 5px 20px 20px;
+    bottom: 20px;
+    left: 5px;
+    box-shadow: 
+        2px 2px 10px rgba(0, 0, 0, 0.2),
+        inset 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .coffee-liquid {
@@ -203,58 +260,82 @@ body {
     top: 10px;
     left: 5px;
     right: 5px;
-    height: 30px;
+    height: 40px;
     background: linear-gradient(to bottom, #6f4e37, #8b5a2b);
-    border-radius: 5px 5px 15px 15px;
+    border-radius: 3px 3px 15px 15px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .coffee-handle {
     position: absolute;
-    right: -15px;
-    top: 15px;
+    right: -12px;
+    top: 20px;
     width: 20px;
-    height: 30px;
-    border: 6px solid #ffffff;
-    border-radius: 0 10px 10px 0;
+    height: 35px;
+    border: 8px solid #ffffff;
     border-left: none;
-    box-shadow: inset 2px 0 5px rgba(0,0,0,0.1);
+    border-radius: 0 15px 15px 0;
+    box-shadow: 
+        2px 0 5px rgba(0, 0, 0, 0.2),
+        inset 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .coffee-steam {
     position: absolute;
-    top: -20px;
-    left: 25px;
-    width: 3px;
-    height: 20px;
-    background: rgba(255,255,255,0.7);
+    width: 4px;
+    background: rgba(255, 255, 255, 0.7);
     border-radius: 2px;
-    animation: steam 3s ease-in-out infinite;
+    animation: steam-rise 4s ease-in-out infinite;
+}
+
+.coffee-steam:nth-child(1) {
+    height: 30px;
+    top: -25px;
+    left: 25px;
+    animation-delay: 0s;
 }
 
 .coffee-steam:nth-child(2) {
-    left: 15px;
+    height: 25px;
+    top: -20px;
+    left: 40px;
     animation-delay: 0.5s;
 }
 
 .coffee-steam:nth-child(3) {
-    left: 35px;
+    height: 20px;
+    top: -15px;
+    left: 15px;
     animation-delay: 1s;
 }
 
-@keyframes steam {
-    0%, 100% { opacity: 0; transform: translateY(0); }
-    50% { opacity: 1; transform: translateY(-10px); }
+@keyframes steam-rise {
+    0%, 100% { 
+        opacity: 0; 
+        transform: translateY(0) scale(1);
+    }
+    50% { 
+        opacity: 0.8; 
+        transform: translateY(-15px) scale(1.1);
+    }
+}
+
+/* 锁图标 */
+.lock-icon {
+    width: 60px;
+    height: 60px;
 }
 
 /* ===== 密码弹窗 ===== */
 .modal {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.8);
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 10;
+    z-index: 20;
+    backdrop-filter: blur(5px);
 }
 
 .modal.active {
@@ -263,113 +344,131 @@ body {
 
 .modal-box {
     background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
-    padding: 40px;
-    border-radius: 18px;
-    width: 450px;
+    padding: 50px 40px;
+    border-radius: 20px;
+    width: 480px;
     text-align: center;
     color: #2e4d3a;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.4),
+        inset 0 2px 20px rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .modal-box h2 {
-    margin-bottom: 25px;
-    font-size: 1.8rem;
+    margin-bottom: 30px;
+    font-size: 2rem;
     color: #2e7d32;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .password-inputs {
     display: flex;
-    gap: 12px;
+    gap: 15px;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .password-inputs input {
-    width: 60px;
-    height: 70px;
-    font-size: 2.2rem;
+    width: 65px;
+    height: 80px;
+    font-size: 2.4rem;
     text-align: center;
-    border: 2px solid #81c784;
-    border-radius: 10px;
+    border: 3px solid #81c784;
+    border-radius: 12px;
     outline: none;
     color: #2e7d32;
     font-weight: bold;
     background: white;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .password-inputs input:focus {
     border-color: #4caf50;
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.3);
+    transform: translateY(-2px);
 }
 
 .hint {
-    font-size: 0.95rem;
-    margin-bottom: 25px;
-    line-height: 1.5;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    color: #558b2f;
 }
 
 .hint span {
     color: #d32f2f;
     font-weight: bold;
     font-style: italic;
+    font-size: 1.2rem;
 }
 
 .modal-actions {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
+    gap: 20px;
 }
 
 .modal-actions button {
-    padding: 12px 25px;
+    padding: 15px 30px;
     border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 10px;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: all 0.2s;
-    min-width: 100px;
+    transition: all 0.3s;
+    min-width: 120px;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 .back-btn {
-    background: #cfd8dc;
+    background: linear-gradient(145deg, #cfd8dc, #b0bec5);
     color: #37474f;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .back-btn:hover {
-    background: #b0bec5;
+    background: linear-gradient(145deg, #b0bec5, #90a4ae);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .submit-btn {
-    background: linear-gradient(to bottom, #66bb6a, #4caf50);
+    background: linear-gradient(145deg, #66bb6a, #4caf50);
     color: white;
-    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .submit-btn:hover {
-    background: linear-gradient(to bottom, #4caf50, #388e3c);
+    background: linear-gradient(145deg, #4caf50, #388e3c);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* 提示跳动 */
-@keyframes jump {
+/* 提示跳动动画 */
+@keyframes hintJump {
     0%, 100% { transform: translateY(0) scale(1); }
-    25% { transform: translateY(-6px) scale(1.05); }
+    25% { transform: translateY(-8px) scale(1.1); }
     50% { transform: translateY(0) scale(1); }
-    75% { transform: translateY(-3px) scale(1.02); }
+    75% { transform: translateY(-4px) scale(1.05); }
 }
 
 .hint.jump {
-    animation: jump 0.6s ease 2;
+    animation: hintJump 0.8s ease 2;
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
-    .text-block {
-        font-size: 1.4rem;
-        line-height: 2;
-        padding: 15px;
+    .text-line {
+        font-size: 1.6rem;
+        line-height: 2.2;
+        margin-bottom: 30px;
+        min-height: 60px;
     }
     
     .modal-box {
@@ -378,13 +477,21 @@ body {
     }
     
     .password-inputs input {
-        width: 50px;
-        height: 60px;
-        font-size: 1.8rem;
+        width: 55px;
+        height: 70px;
+        font-size: 2rem;
     }
     
     .coffee-btn, .lock-btn {
         transform: scale(0.9);
+    }
+    
+    .coffee-btn:hover {
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    
+    .lock-btn:hover {
+        transform: scale(1.05);
     }
 }
 </style>
@@ -406,40 +513,51 @@ body {
 <!-- 柳絮 -->
 <script>
 // 创建绿色柳絮
-for (let i = 0; i < 25; i++) {
+for (let i = 0; i < 20; i++) {
     const catkin = document.createElement('div');
     catkin.className = 'catkin';
+    
     // 随机位置
     catkin.style.left = Math.random() * 100 + '%';
+    
     // 随机大小
-    const size = 4 + Math.random() * 6;
+    const size = 6 + Math.random() * 8;
     catkin.style.width = size + 'px';
     catkin.style.height = size + 'px';
+    
     // 随机动画时长
-    const duration = 15 + Math.random() * 15;
+    const duration = 15 + Math.random() * 20;
     catkin.style.animationDuration = duration + 's';
-    catkin.style.animationDelay = Math.random() * 10 + 's';
+    catkin.style.animationDelay = Math.random() * 15 + 's';
+    
     // 随机透明度
-    catkin.style.opacity = 0.6 + Math.random() * 0.4;
+    catkin.style.opacity = 0.5 + Math.random() * 0.5;
+    
+    // 随机颜色偏移
+    const hue = 120 + (Math.random() * 20 - 10); // 绿色系
+    catkin.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 75%), hsl(${hue}, 60%, 85%))`;
+    
     document.body.appendChild(catkin);
 }
 </script>
 
 <!-- 文字内容 -->
-<div class="text-wrapper" id="textWrapper">
-    <div class="text-block" id="textBlock">
-        <p>YeXi Lake was built in the 1980s.</p>
-        <p>At that time, the central area of the west campus of USTC was still a messy low-lying area.</p>
-        <p>Teachers and students participated together in dredging and renovation, turning it into a garden landscape.</p>
-        <p>There is an island in the lake, connected to the south bank by a wooden bridge called the Nine-Curve Bridge.</p>
-        <p>A small pavilion stands on the island, named Yixin Pavilion.</p>
-        <p>The northeast corner of the lake is Fanghua Garden.</p>
-        <p>Tall metasequoia trees grow in YeXi Lake, and plum and peach trees are planted along the lakeside.</p>
-        <p>Winter brings wild ducks to spend the season here.</p>
-        <p>What is particularly unique is its name—YeXi Lake.</p>
-        <p>Perhaps intentionally following the naming of West Lake,</p>
-        <p>this place may not have the fame of the paradise in Suzhou and Hangzhou,</p>
-        <p>but the scenery is similar—"Except for Hangzhou, there is also YeXi Lake."</p>
+<div class="text-master-container">
+    <div class="text-scroll-container" id="textScrollContainer">
+        <div class="text-content" id="textContent">
+            <div class="text-line" id="line1">YeXi Lake was built in the 1980s.</div>
+            <div class="text-line" id="line2">At that time, the central area of the west campus of USTC was still a messy low-lying area.</div>
+            <div class="text-line" id="line3">Teachers and students participated together in dredging and renovation, turning it into a garden landscape.</div>
+            <div class="text-line" id="line4">There is an island in the lake, connected to the south bank by a wooden bridge called the Nine-Curve Bridge.</div>
+            <div class="text-line" id="line5">A small pavilion stands on the island, named Yixin Pavilion.</div>
+            <div class="text-line" id="line6">The northeast corner of the lake is Fanghua Garden.</div>
+            <div class="text-line" id="line7">Tall metasequoia trees grow in YeXi Lake, and plum and peach trees are planted along the lakeside.</div>
+            <div class="text-line" id="line8">Winter brings wild ducks to spend the season here.</div>
+            <div class="text-line" id="line9">What is particularly unique is its name—YeXi Lake.</div>
+            <div class="text-line" id="line10">Perhaps intentionally following the naming of West Lake,</div>
+            <div class="text-line" id="line11">this place may not have the fame of the paradise in Suzhou and Hangzhou,</div>
+            <div class="text-line" id="line12">but the scenery is similar—"Except for Hangzhou, there is also YeXi Lake."</div>
+        </div>
     </div>
 </div>
 
@@ -447,6 +565,7 @@ for (let i = 0; i < 25; i++) {
 <div class="icon-area" id="iconArea">
     <div class="coffee-btn" id="coffeeBtn">
         <div class="coffee-icon">
+            <div class="coffee-saucer"></div>
             <div class="coffee-cup">
                 <div class="coffee-liquid"></div>
             </div>
@@ -458,11 +577,17 @@ for (let i = 0; i < 25; i++) {
     </div>
 
     <div class="lock-btn" id="lockBtn">
-        <svg width="60" height="60" viewBox="0 0 100 100">
-            <rect x="30" y="50" width="40" height="30" rx="6" fill="#ddd"/>
-            <rect x="45" y="30" width="10" height="20" fill="#ddd"/>
-            <circle cx="50" cy="30" r="12" fill="#ddd"/>
-            <circle cx="50" cy="60" r="5" fill="#444"/>
+        <svg class="lock-icon" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="lockGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#f0f0f0" />
+                    <stop offset="100%" stop-color="#cccccc" />
+                </linearGradient>
+            </defs>
+            <rect x="30" y="50" width="40" height="30" rx="6" fill="url(#lockGradient)"/>
+            <rect x="45" y="30" width="10" height="20" fill="url(#lockGradient)"/>
+            <circle cx="50" cy="30" r="12" fill="url(#lockGradient)"/>
+            <circle cx="50" cy="60" r="5" fill="#333"/>
         </svg>
     </div>
 </div>
@@ -472,10 +597,10 @@ for (let i = 0; i < 25; i++) {
     <div class="modal-box">
         <h2>Enter 4‑digit Password</h2>
         <div class="password-inputs">
-            <input type="text" maxlength="1" id="digit1">
-            <input type="text" maxlength="1" id="digit2">
-            <input type="text" maxlength="1" id="digit3">
-            <input type="text" maxlength="1" id="digit4">
+            <input type="text" maxlength="1" id="digit1" autocomplete="off">
+            <input type="text" maxlength="1" id="digit2" autocomplete="off">
+            <input type="text" maxlength="1" id="digit3" autocomplete="off">
+            <input type="text" maxlength="1" id="digit4" autocomplete="off">
         </div>
         <p class="hint" id="hint">Need a hint? <span>Maybe look for inspiration in the café?</span></p>
         <div class="modal-actions">
@@ -488,8 +613,8 @@ for (let i = 0; i < 25; i++) {
 <script>
 // 元素引用
 const bgs = document.querySelectorAll('.bg');
-const textParagraphs = document.querySelectorAll('#textBlock p');
-const textWrapper = document.getElementById('textWrapper');
+const textLines = document.querySelectorAll('.text-line');
+const textScrollContainer = document.getElementById('textScrollContainer');
 const iconArea = document.getElementById('iconArea');
 const modal = document.getElementById('modal');
 const digitInputs = document.querySelectorAll('.password-inputs input');
@@ -502,48 +627,31 @@ const submitBtn = document.getElementById('submitBtn');
 // 背景轮播参数
 let currentBgIndex = 0;
 const bgCount = bgs.length;
-const bgDuration = 5000; // 每张背景显示5秒
-const textStartDelay = 1000; // 文字开始动画的延迟
-let slideUpAnimation = null;
+const bgDuration = 7000; // 每张背景显示7秒（比以前慢）
+const textScrollDuration = 120000; // 文字总滑动时间：120秒
 
 // 初始化
 function init() {
+    // 重置文字容器位置
+    textScrollContainer.style.top = '100%'; // 从屏幕底部开始
+    
     // 启动背景轮播
     startBackgroundCarousel();
+    
+    // 启动文字动画
+    startTextAnimation();
     
     // 设置密码验证功能
     setupPasswordValidation();
     
     // 咖啡按钮点击事件
     coffeeBtn.addEventListener('click', () => {
-        alert("The café is a cozy spot on campus. Have you noticed the password hint?");
+        alert("A quiet café on campus... Maybe the password is related to a special year?");
     });
 }
 
 // 背景轮播
 function startBackgroundCarousel() {
-    // 延迟后开始文字上滑动画
-    setTimeout(() => {
-        // 计算文字总高度，设置足够长的上滑距离
-        const textHeight = textWrapper.querySelector('.text-block').scrollHeight;
-        const viewportHeight = window.innerHeight;
-        const slideDistance = textHeight + viewportHeight + 100; // 确保完全滑出
-        
-        textWrapper.style.animation = `slideUp ${(bgCount - 1) * bgDuration - 2000}ms linear forwards`;
-        
-        // 逐行显示文字
-        let lineIndex = 0;
-        const showNextLine = () => {
-            if (lineIndex < textParagraphs.length) {
-                textParagraphs[lineIndex].classList.add('show');
-                lineIndex++;
-                setTimeout(showNextLine, 2000); // 每2秒显示一行
-            }
-        };
-        setTimeout(showNextLine, 1000);
-    }, textStartDelay);
-    
-    // 背景切换
     const bgInterval = setInterval(() => {
         bgs[currentBgIndex].classList.remove('active');
         currentBgIndex++;
@@ -556,7 +664,7 @@ function startBackgroundCarousel() {
                 clearInterval(bgInterval);
                 setTimeout(() => {
                     iconArea.classList.add('visible');
-                }, 2000);
+                }, 3000);
             }
         } else {
             clearInterval(bgInterval);
@@ -564,12 +672,47 @@ function startBackgroundCarousel() {
     }, bgDuration);
 }
 
+// 文字动画
+function startTextAnimation() {
+    // 计算总滑动距离
+    const textContainerHeight = textScrollContainer.scrollHeight;
+    const viewportHeight = window.innerHeight;
+    const totalScrollDistance = textContainerHeight + viewportHeight;
+    
+    // 设置滑动动画
+    setTimeout(() => {
+        // 缓慢上滑
+        textScrollContainer.style.transition = `top ${textScrollDuration}ms linear`;
+        textScrollContainer.style.top = `-${totalScrollDistance}px`;
+    }, 1000);
+    
+    // 逐行显示文字
+    let lineIndex = 0;
+    const showNextLine = () => {
+        if (lineIndex < textLines.length) {
+            // 确保每行文字在显示时都在相同位置
+            textLines[lineIndex].classList.add('show');
+            lineIndex++;
+            
+            // 控制行显示速度，大约每6秒显示一行
+            if (lineIndex < textLines.length) {
+                setTimeout(showNextLine, 6000);
+            }
+        }
+    };
+    
+    // 延迟1秒后开始显示第一行
+    setTimeout(showNextLine, 1000);
+}
+
 // 密码验证功能
 function setupPasswordValidation() {
     // 打开密码输入框
     lockBtn.addEventListener('click', () => {
         modal.classList.add('active');
-        digitInputs[0].focus();
+        setTimeout(() => {
+            digitInputs[0].focus();
+        }, 100);
     });
     
     // 关闭密码输入框
@@ -580,22 +723,33 @@ function setupPasswordValidation() {
     
     // 密码输入框逻辑
     digitInputs.forEach((input, index) => {
+        // 只允许数字输入
         input.addEventListener('input', (e) => {
-            // 只允许数字输入
-            input.value = input.value.replace(/\D/g, '');
+            const value = e.target.value;
+            const numericValue = value.replace(/\D/g, '');
+            e.target.value = numericValue.slice(0, 1);
             
             // 如果输入了数字，自动跳转到下一个输入框
-            if (e.target.value.length === 1) {
-                if (index < digitInputs.length - 1) {
-                    digitInputs[index + 1].focus();
-                }
+            if (numericValue.length === 1 && index < digitInputs.length - 1) {
+                digitInputs[index + 1].focus();
             }
         });
         
         // 处理退格键
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+            if (e.key === 'Backspace' && input.value === '' && index > 0) {
                 digitInputs[index - 1].focus();
+            }
+            
+            // 左右箭头导航
+            if (e.key === 'ArrowLeft' && index > 0) {
+                digitInputs[index - 1].focus();
+                e.preventDefault();
+            }
+            
+            if (e.key === 'ArrowRight' && index < digitInputs.length - 1) {
+                digitInputs[index + 1].focus();
+                e.preventDefault();
             }
         });
     });
@@ -631,7 +785,7 @@ function checkPassword() {
         // 动画结束后移除类，以便下次可以再次触发
         setTimeout(() => {
             hint.classList.remove('jump');
-        }, 1200);
+        }, 1600);
     }
 }
 
@@ -640,11 +794,32 @@ function clearPasswordInputs() {
     digitInputs.forEach(input => {
         input.value = '';
     });
-    digitInputs[0].focus();
+    setTimeout(() => {
+        digitInputs[0].focus();
+    }, 50);
 }
 
 // 页面加载完成后启动
 window.addEventListener('load', init);
+
+// 窗口大小变化时重新计算位置
+window.addEventListener('resize', () => {
+    // 停止当前动画
+    textScrollContainer.style.transition = 'none';
+    
+    // 重置位置
+    textScrollContainer.style.top = '100%';
+    
+    // 重新计算并开始动画
+    setTimeout(() => {
+        const textContainerHeight = textScrollContainer.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const totalScrollDistance = textContainerHeight + viewportHeight;
+        
+        textScrollContainer.style.transition = `top ${textScrollDuration}ms linear`;
+        textScrollContainer.style.top = `-${totalScrollDistance}px`;
+    }, 100);
+});
 </script>
 
 </body>
