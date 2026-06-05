@@ -92,7 +92,7 @@ body {
 }
 
 /* ===== 文字容器 ===== */
-.text-container {
+.text-master-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -103,13 +103,23 @@ body {
     pointer-events: none;
 }
 
-.text-scroll-wrapper {
+.text-scroll-container {
     position: absolute;
     top: 100vh; /* 从屏幕底部开始 */
     left: 0;
     width: 100%;
     height: auto;
-    will-change: transform;
+    animation: slideUp 30s linear forwards; /* 30秒滑动时间 */
+    animation-delay: 1s; /* 延迟1秒开始 */
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(calc(-100vh - 2000px)); /* 确保完全滑出屏幕 */
+    }
 }
 
 .text-content {
@@ -128,8 +138,8 @@ body {
         3px 3px 8px rgba(0, 0, 0, 0.9),
         -1px -1px 4px rgba(255, 255, 255, 0.4);
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(100px); /* 从下方进入 */
+    transition: all 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     margin-bottom: 50px;
     min-height: 80px;
     display: flex;
@@ -144,14 +154,10 @@ body {
     transform: translateY(0);
 }
 
-/* 文字滑动动画 */
-@keyframes slideUp {
-    from {
-        transform: translateY(0);
-    }
-    to {
-        transform: translateY(calc(-100vh - 2000px)); /* 确保完全滑出屏幕 */
-    }
+/* 确保每行文字进入时都从屏幕底部 */
+.text-line.entering {
+    position: relative;
+    top: 100vh; /* 从屏幕底部开始 */
 }
 
 /* ===== 图标按钮 ===== */
@@ -174,8 +180,8 @@ body {
 
 .coffee-btn {
     position: absolute;
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(12px);
@@ -191,6 +197,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    overflow: hidden; /* 确保图片裁剪为圆形 */
 }
 
 .coffee-btn:hover {
@@ -199,6 +206,19 @@ body {
     box-shadow: 
         0 15px 40px rgba(0, 0, 0, 0.4),
         inset 0 2px 15px rgba(255, 255, 255, 0.3);
+}
+
+/* 咖啡图片样式 */
+.coffee-img {
+    width: 85%;
+    height: 85%;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.coffee-btn:hover .coffee-img {
+    transform: scale(1.1);
 }
 
 .lock-btn {
@@ -227,114 +247,6 @@ body {
     box-shadow: 
         0 15px 40px rgba(0, 0, 0, 0.4),
         inset 0 2px 15px rgba(255, 255, 255, 0.3);
-}
-
-/* 咖啡图标 - 45度俯视角（观察者俯视） */
-.coffee-icon {
-    width: 80px;
-    height: 80px;
-    position: relative;
-    transform-style: preserve-3d;
-    perspective: 1000px;
-}
-
-/* 咖啡杯（从上往下看的椭圆形） */
-.coffee-cup-outer {
-    position: absolute;
-    width: 70px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 35px 35px 20px 20px;
-    bottom: 5px;
-    left: 5px;
-    box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.2),
-        inset 0 2px 10px rgba(0, 0, 0, 0.1);
-    transform: perspective(300px) rotateX(20deg);
-}
-
-/* 杯内液体（从上往下看） */
-.coffee-liquid {
-    position: absolute;
-    width: 60px;
-    height: 35px;
-    background: linear-gradient(135deg, #6f4e37, #8b5a2b);
-    border-radius: 30px 30px 15px 15px;
-    bottom: 10px;
-    left: 10px;
-    box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.3);
-    transform: perspective(300px) rotateX(20deg);
-}
-
-/* 杯柄（俯视角能看到的部分） */
-.coffee-handle {
-    position: absolute;
-    right: -5px;
-    top: 15px;
-    width: 20px;
-    height: 30px;
-    border: 8px solid rgba(255, 255, 255, 0.9);
-    border-left: none;
-    border-radius: 0 15px 15px 0;
-    box-shadow: 
-        3px 0 8px rgba(0, 0, 0, 0.2),
-        inset 2px 0 5px rgba(0, 0, 0, 0.1);
-    transform: perspective(300px) rotateX(20deg) rotateY(-10deg);
-}
-
-/* 杯托（俯视角的圆形） */
-.coffee-saucer {
-    position: absolute;
-    width: 100px;
-    height: 25px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 50%;
-    bottom: -5px;
-    left: -10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    transform: perspective(300px) rotateX(20deg);
-}
-
-/* 蒸汽 */
-.coffee-steam {
-    position: absolute;
-    width: 4px;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 2px;
-    animation: steam-rise 3s ease-in-out infinite;
-    filter: blur(0.5px);
-}
-
-.coffee-steam:nth-child(1) {
-    height: 25px;
-    top: -20px;
-    left: 20px;
-    animation-delay: 0s;
-}
-
-.coffee-steam:nth-child(2) {
-    height: 20px;
-    top: -15px;
-    left: 40px;
-    animation-delay: 0.4s;
-}
-
-.coffee-steam:nth-child(3) {
-    height: 15px;
-    top: -10px;
-    left: 10px;
-    animation-delay: 0.8s;
-}
-
-@keyframes steam-rise {
-    0%, 100% { 
-        opacity: 0; 
-        transform: translateY(0) scale(0.8);
-    }
-    50% { 
-        opacity: 0.8; 
-        transform: translateY(-12px) scale(1);
-    }
 }
 
 /* 锁图标 */
@@ -521,6 +433,16 @@ body {
         transform: scale(0.9);
     }
     
+    .coffee-btn {
+        width: 130px;
+        height: 130px;
+    }
+    
+    .lock-btn {
+        width: 100px;
+        height: 100px;
+    }
+    
     .coffee-btn:hover {
         transform: translate(-50%, -50%) scale(1.05);
     }
@@ -529,8 +451,9 @@ body {
         transform: scale(1.05);
     }
     
-    .coffee-icon {
-        transform: scale(0.9);
+    .coffee-img {
+        width: 80%;
+        height: 80%;
     }
 }
 </style>
@@ -577,8 +500,8 @@ for (let i = 0; i < 18; i++) {
 </script>
 
 <!-- 文字内容 -->
-<div class="text-container" id="textContainer">
-    <div class="text-scroll-wrapper" id="textScrollWrapper">
+<div class="text-master-container">
+    <div class="text-scroll-container" id="textScrollContainer">
         <div class="text-content" id="textContent">
             <div class="text-line" id="line1">YeXi Lake was built in the 1980s.</div>
             <div class="text-line" id="line2">At that time, the central area of the west campus of USTC was still a messy low-lying area.</div>
@@ -599,15 +522,7 @@ for (let i = 0; i < 18; i++) {
 <!-- 图标区域 -->
 <div class="icon-area" id="iconArea">
     <div class="coffee-btn" id="coffeeBtn">
-        <div class="coffee-icon">
-            <div class="coffee-saucer"></div>
-            <div class="coffee-cup-outer"></div>
-            <div class="coffee-liquid"></div>
-            <div class="coffee-handle"></div>
-            <div class="coffee-steam"></div>
-            <div class="coffee-steam"></div>
-            <div class="coffee-steam"></div>
-        </div>
+        <img src="images/coffee.jpg" alt="Coffee" class="coffee-img" onerror="this.style.display='none';this.parentElement.innerHTML='☕';">
     </div>
 
     <div class="lock-btn" id="lockBtn">
@@ -648,8 +563,8 @@ for (let i = 0; i < 18; i++) {
 // 元素引用
 const bgs = document.querySelectorAll('.bg');
 const textLines = document.querySelectorAll('.text-line');
-const textScrollWrapper = document.getElementById('textScrollWrapper');
-const textContainer = document.getElementById('textContainer');
+const textScrollContainer = document.getElementById('textScrollContainer');
+const textContent = document.getElementById('textContent');
 const iconArea = document.getElementById('iconArea');
 const modal = document.getElementById('modal');
 const digitInputs = document.querySelectorAll('.password-inputs input');
@@ -658,19 +573,39 @@ const coffeeBtn = document.getElementById('coffeeBtn');
 const lockBtn = document.getElementById('lockBtn');
 const backBtn = document.getElementById('backBtn');
 const submitBtn = document.getElementById('submitBtn');
+const coffeeImg = document.querySelector('.coffee-img');
 
 // 参数设置
 let currentBgIndex = 0;
 const bgCount = bgs.length;
 const bgDuration = 6000; // 每张背景6秒
-const totalTextDuration = (bgCount - 1) * bgDuration; // 文字动画总时长 = 背景切换总时间
-let textAnimation = null;
+const totalTextDuration = 30000; // 文字动画总时长30秒
 let bgInterval = null;
+
+// 图片加载错误处理
+if (coffeeImg) {
+    coffeeImg.onerror = function() {
+        // 如果图片加载失败，显示备用图标
+        this.style.display = 'none';
+        const fallback = document.createElement('div');
+        fallback.innerHTML = '☕';
+        fallback.style.fontSize = '60px';
+        fallback.style.color = '#6f4e37';
+        fallback.style.display = 'flex';
+        fallback.style.alignItems = 'center';
+        fallback.style.justifyContent = 'center';
+        fallback.style.width = '100%';
+        fallback.style.height = '100%';
+        this.parentElement.appendChild(fallback);
+    };
+}
 
 // 初始化
 function init() {
-    // 重置初始位置
-    textScrollWrapper.style.transform = 'translateY(0)';
+    // 设置文字初始位置 - 确保从屏幕底部开始
+    setTimeout(() => {
+        positionLinesAtBottom();
+    }, 100);
     
     // 启动背景轮播
     startBackgroundCarousel();
@@ -684,6 +619,26 @@ function init() {
     // 咖啡按钮点击事件
     coffeeBtn.addEventListener('click', () => {
         alert("A quiet café on campus... Maybe the password is related to a special year?");
+    });
+}
+
+// 将每行文字定位到屏幕底部
+function positionLinesAtBottom() {
+    const viewportHeight = window.innerHeight;
+    
+    textLines.forEach((line, index) => {
+        // 重置位置
+        line.style.position = 'relative';
+        line.style.top = '0';
+        
+        // 添加进入类
+        line.classList.add('entering');
+        
+        // 设置进入动画
+        setTimeout(() => {
+            line.style.transition = 'all 2.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            line.style.top = '0';
+        }, index * 2500); // 每行间隔2.5秒
     });
 }
 
@@ -711,19 +666,19 @@ function startBackgroundCarousel() {
 
 // 文字动画
 function startTextAnimation() {
-    // 计算文字总高度和滑动距离
-    const textContentHeight = document.getElementById('textContent').scrollHeight;
-    const viewportHeight = window.innerHeight;
-    const totalScrollDistance = textContentHeight + viewportHeight;
-    
-    // 延迟1秒后开始文字动画
+    // 延迟1秒后开始文字滑动动画
     setTimeout(() => {
-        // 开始滑动
-        textScrollWrapper.style.transition = `transform ${totalTextDuration}ms linear`;
-        textScrollWrapper.style.transform = `translateY(-${totalScrollDistance}px)`;
+        // 计算总滑动距离
+        const textContentHeight = textContent.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const totalScrollDistance = textContentHeight + viewportHeight + 500; // 额外距离确保完全滑出
         
         // 开始逐行显示文字
         startLineReveal();
+        
+        // 启动滑动动画
+        textScrollContainer.style.animation = `slideUp ${totalTextDuration}ms linear forwards`;
+        
     }, 1000);
 }
 
@@ -745,7 +700,7 @@ function startLineReveal() {
         }
     }
     
-    // 延迟一下开始
+    // 延迟500ms开始
     setTimeout(() => {
         showNextLine();
     }, 500);
@@ -875,25 +830,8 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        // 重置动画
-        if (textScrollWrapper.style.transition) {
-            textScrollWrapper.style.transition = 'none';
-            
-            // 重新计算距离
-            const textContentHeight = document.getElementById('textContent').scrollHeight;
-            const viewportHeight = window.innerHeight;
-            const totalScrollDistance = textContentHeight + viewportHeight;
-            const progress = currentBgIndex / (bgCount - 1);
-            const currentDistance = totalScrollDistance * progress;
-            
-            textScrollWrapper.style.transform = `translateY(-${currentDistance}px)`;
-            
-            // 重新开始动画
-            setTimeout(() => {
-                textScrollWrapper.style.transition = `transform ${totalTextDuration * (1 - progress)}ms linear`;
-                textScrollWrapper.style.transform = `translateY(-${totalScrollDistance}px)`;
-            }, 50);
-        }
+        // 重置文字位置
+        positionLinesAtBottom();
     }, 250);
 });
 </script>
