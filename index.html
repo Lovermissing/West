@@ -1,611 +1,651 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USTC West Campus Exploration</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            height: 100vh;
-            overflow: hidden;
-            color: white;
-            position: relative;
-        }
-        
-        /* 背景容器 */
-        .bg-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        /* 背景图片 - 默认隐藏 */
-        .bg-image {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            transition: opacity 3s ease-in-out;
-        }
-        
-        /* 设置每张背景图片 */
-        #bg1 { background-image: url('images/1.jpg'); }
-        #bg2 { background-image: url('images/2.jpeg'); }
-        #bg3 { background-image: url('images/3.jpeg'); }
-        #bg4 { background-image: url('images/4.jpeg'); }
-        #bg5 { background-image: url('images/5.jpg'); }
-        #bg6 { background-image: url('images/yexi.jpeg'); }
-        
-        /* 当前显示的背景图片 */
-        .bg-active {
-            opacity: 1;
-        }
-        
-        /* 背景遮罩层 */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 2;
-        }
-        
-        /* 文字容器 */
-        .text-container {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 3;
-        }
-        
-        /* 文字样式 */
-        .intro-text {
-            max-width: 800px;
-            padding: 20px;
-            font-size: 1.5rem;
-            line-height: 1.8;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            margin: 0 20px;
-        }
-        
-        /* 图标按钮容器 */
-        .icons-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 4;
-            opacity: 0;
-            transition: opacity 2s ease-in;
-        }
-        
-        .icons-visible {
-            opacity: 1;
-        }
-        
-        /* 咖啡按钮样式 */
-        .coffee-btn {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 3px solid rgba(255, 255, 255, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .coffee-btn:hover {
-            transform: scale(1.1);
-            background-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
-        
-        .coffee-btn svg {
-            width: 70px;
-            height: 70px;
-        }
-        
-        /* 锁按钮样式 */
-        .lock-btn {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            bottom: 50px;
-            right: 50px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 3px solid rgba(255, 255, 255, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .lock-btn:hover {
-            transform: scale(1.1);
-            background-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
-        
-        .lock-btn svg {
-            width: 60px;
-            height: 60px;
-        }
-        
-        /* 密码输入框样式 */
-        .password-modal {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-        
-        .modal-content {
-            background-color: white;
-            padding: 40px;
-            border-radius: 15px;
-            width: 400px;
-            max-width: 90%;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .modal-title {
-            color: #333;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-        
-        .password-inputs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .password-digit {
-            width: 60px;
-            height: 60px;
-            text-align: center;
-            font-size: 2rem;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            outline: none;
-        }
-        
-        .password-digit:focus {
-            border-color: #4a8fe7;
-        }
-        
-        .hint-text {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-        }
-        
-        .hint-text span {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .modal-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .back-btn {
-            background-color: #e0e0e0;
-            color: #333;
-        }
-        
-        .back-btn:hover {
-            background-color: #d0d0d0;
-        }
-        
-        .submit-btn {
-            background-color: #4a8fe7;
-            color: white;
-        }
-        
-        .submit-btn:hover {
-            background-color: #3a7bd5;
-        }
-        
-        /* 提示文字跳动动画 */
-        @keyframes hintJump {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        
-        .hint-jump {
-            animation: hintJump 0.5s ease 2;
-        }
-        
-        /* 进度指示器 */
-        .progress-indicator {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 5;
-        }
-        
-        .progress-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.5);
-            transition: all 0.3s;
-        }
-        
-        .progress-active {
-            background-color: rgba(255, 255, 255, 1);
-            transform: scale(1.2);
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .intro-text {
-                font-size: 1.2rem;
-                line-height: 1.6;
-            }
-            
-            .coffee-btn {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .coffee-btn svg {
-                width: 60px;
-                height: 60px;
-            }
-            
-            .lock-btn {
-                width: 80px;
-                height: 80px;
-                bottom: 30px;
-                right: 30px;
-            }
-            
-            .lock-btn svg {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .password-digit {
-                width: 50px;
-                height: 50px;
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USTC West Campus Exploration</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cambria&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cambria', serif;
+    height: 100vh;
+    overflow: hidden;
+    color: white;
+    position: relative;
+}
+
+/* ===== 背景 ===== */
+.bg-container {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 3s ease-in-out;
+    filter: brightness(1.08) saturate(1.05);
+}
+
+.bg.active {
+    opacity: 1;
+}
+
+/* 背景图顺序 */
+#bg1 { background-image: url('images/1.jpg'); }
+#bg2 { background-image: url('images/2.jpeg'); }
+#bg3 { background-image: url('images/3.jpeg'); }
+#bg4 { background-image: url('images/4.jpeg'); }
+#bg5 { background-image: url('images/5.jpg'); }
+#bg6 { background-image: url('images/yexi.jpeg'); }
+
+/* 遮罩 */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 2;
+}
+
+/* ===== 柳絮 ===== */
+.catkin {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(180, 255, 200, 0.8);
+    border-radius: 50%;
+    filter: blur(1px);
+    animation: drift 18s linear infinite;
+    z-index: 3;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translate(200px, -100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== 文字 ===== */
+.text-wrapper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 4;
+}
+
+.text-block {
+    max-width: 900px;
+    font-size: 1.8rem;
+    line-height: 2.2;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-shadow:
+        2px 2px 6px rgba(0,0,0,0.7),
+        -1px -1px 3px rgba(255,255,255,0.3);
+    padding: 20px;
+}
+
+.text-block p {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1.2s ease;
+    margin-bottom: 15px;
+}
+
+.text-block p.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 文本上滑动画 */
+@keyframes slideUp {
+    from { transform: translateY(0); }
+    to { transform: translateY(-3000px); } /* 足够长的距离确保完全滑出 */
+}
+
+/* ===== 图标按钮 ===== */
+.icon-area {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+}
+
+.icon-area.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.coffee-btn {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255,255,255,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.coffee-btn:hover {
+    transform: scale(1.15);
+    background: rgba(255,255,255,0.35);
+}
+
+.lock-btn {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255,255,255,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.lock-btn:hover {
+    transform: scale(1.15);
+    background: rgba(255,255,255,0.35);
+}
+
+/* 咖啡图标 */
+.coffee-icon {
+    position: relative;
+    width: 70px;
+    height: 70px;
+}
+
+.coffee-cup {
+    width: 60px;
+    height: 50px;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border-radius: 8px 8px 20px 20px;
+    position: relative;
+    transform: rotate(-5deg);
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+
+.coffee-liquid {
+    position: absolute;
+    top: 10px;
+    left: 5px;
+    right: 5px;
+    height: 30px;
+    background: linear-gradient(to bottom, #6f4e37, #8b5a2b);
+    border-radius: 5px 5px 15px 15px;
+}
+
+.coffee-handle {
+    position: absolute;
+    right: -15px;
+    top: 15px;
+    width: 20px;
+    height: 30px;
+    border: 6px solid #ffffff;
+    border-radius: 0 10px 10px 0;
+    border-left: none;
+    box-shadow: inset 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.coffee-steam {
+    position: absolute;
+    top: -20px;
+    left: 25px;
+    width: 3px;
+    height: 20px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 2px;
+    animation: steam 3s ease-in-out infinite;
+}
+
+.coffee-steam:nth-child(2) {
+    left: 15px;
+    animation-delay: 0.5s;
+}
+
+.coffee-steam:nth-child(3) {
+    left: 35px;
+    animation-delay: 1s;
+}
+
+@keyframes steam {
+    0%, 100% { opacity: 0; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-10px); }
+}
+
+/* ===== 密码弹窗 ===== */
+.modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-box {
+    background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
+    padding: 40px;
+    border-radius: 18px;
+    width: 450px;
+    text-align: center;
+    color: #2e4d3a;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.modal-box h2 {
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    color: #2e7d32;
+}
+
+.password-inputs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.password-inputs input {
+    width: 60px;
+    height: 70px;
+    font-size: 2.2rem;
+    text-align: center;
+    border: 2px solid #81c784;
+    border-radius: 10px;
+    outline: none;
+    color: #2e7d32;
+    font-weight: bold;
+    background: white;
+    transition: all 0.2s;
+}
+
+.password-inputs input:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.hint {
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.hint span {
+    color: #d32f2f;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 100px;
+}
+
+.back-btn {
+    background: #cfd8dc;
+    color: #37474f;
+}
+
+.back-btn:hover {
+    background: #b0bec5;
+}
+
+.submit-btn {
+    background: linear-gradient(to bottom, #66bb6a, #4caf50);
+    color: white;
+    font-weight: bold;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(to bottom, #4caf50, #388e3c);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* 提示跳动 */
+@keyframes jump {
+    0%, 100% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-6px) scale(1.05); }
+    50% { transform: translateY(0) scale(1); }
+    75% { transform: translateY(-3px) scale(1.02); }
+}
+
+.hint.jump {
+    animation: jump 0.6s ease 2;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .text-block {
+        font-size: 1.4rem;
+        line-height: 2;
+        padding: 15px;
+    }
+    
+    .modal-box {
+        width: 90%;
+        padding: 30px 20px;
+    }
+    
+    .password-inputs input {
+        width: 50px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+    
+    .coffee-btn, .lock-btn {
+        transform: scale(0.9);
+    }
+}
+</style>
 </head>
+
 <body>
-    <!-- 背景图片容器 -->
-    <div class="bg-container">
-        <div class="bg-image bg-active" id="bg1"></div>
-        <div class="bg-image" id="bg2"></div>
-        <div class="bg-image" id="bg3"></div>
-        <div class="bg-image" id="bg4"></div>
-        <div class="bg-image" id="bg5"></div>
-        <div class="bg-image" id="bg6"></div>
+
+<div class="bg-container">
+    <div class="bg active" id="bg1"></div>
+    <div class="bg" id="bg2"></div>
+    <div class="bg" id="bg3"></div>
+    <div class="bg" id="bg4"></div>
+    <div class="bg" id="bg5"></div>
+    <div class="bg" id="bg6"></div>
+</div>
+
+<div class="overlay"></div>
+
+<!-- 柳絮 -->
+<script>
+// 创建绿色柳絮
+for (let i = 0; i < 25; i++) {
+    const catkin = document.createElement('div');
+    catkin.className = 'catkin';
+    // 随机位置
+    catkin.style.left = Math.random() * 100 + '%';
+    // 随机大小
+    const size = 4 + Math.random() * 6;
+    catkin.style.width = size + 'px';
+    catkin.style.height = size + 'px';
+    // 随机动画时长
+    const duration = 15 + Math.random() * 15;
+    catkin.style.animationDuration = duration + 's';
+    catkin.style.animationDelay = Math.random() * 10 + 's';
+    // 随机透明度
+    catkin.style.opacity = 0.6 + Math.random() * 0.4;
+    document.body.appendChild(catkin);
+}
+</script>
+
+<!-- 文字内容 -->
+<div class="text-wrapper" id="textWrapper">
+    <div class="text-block" id="textBlock">
+        <p>YeXi Lake was built in the 1980s.</p>
+        <p>At that time, the central area of the west campus of USTC was still a messy low-lying area.</p>
+        <p>Teachers and students participated together in dredging and renovation, turning it into a garden landscape.</p>
+        <p>There is an island in the lake, connected to the south bank by a wooden bridge called the Nine-Curve Bridge.</p>
+        <p>A small pavilion stands on the island, named Yixin Pavilion.</p>
+        <p>The northeast corner of the lake is Fanghua Garden.</p>
+        <p>Tall metasequoia trees grow in YeXi Lake, and plum and peach trees are planted along the lakeside.</p>
+        <p>Winter brings wild ducks to spend the season here.</p>
+        <p>What is particularly unique is its name—YeXi Lake.</p>
+        <p>Perhaps intentionally following the naming of West Lake,</p>
+        <p>this place may not have the fame of the paradise in Suzhou and Hangzhou,</p>
+        <p>but the scenery is similar—"Except for Hangzhou, there is also YeXi Lake."</p>
     </div>
-    
-    <!-- 背景遮罩层 -->
-    <div class="overlay"></div>
-    
-    <!-- 进度指示器 -->
-    <div class="progress-indicator">
-        <div class="progress-dot progress-active" id="dot1"></div>
-        <div class="progress-dot" id="dot2"></div>
-        <div class="progress-dot" id="dot3"></div>
-        <div class="progress-dot" id="dot4"></div>
-        <div class="progress-dot" id="dot5"></div>
-        <div class="progress-dot" id="dot6"></div>
-    </div>
-    
-    <!-- 文字介绍容器 -->
-    <div class="text-container" id="textContainer">
-        <div class="intro-text" id="introText">
-            YeXi Lake was built in the 1980s. At that time, the central area of the west campus of USTC was still a messy low-lying area. Teachers and students participated together in dredging and renovation, turning it into a garden landscape. There is an island in the lake, connected to the south bank by a wooden bridge called the Nine-Curve Bridge. A small pavilion stands on the island, named Yixin Pavilion. The northeast corner of the lake is Fanghua Garden. Tall metasequoia trees grow in YeXi Lake, and plum and peach trees are planted along the lakeside. Wild ducks come here to spend the winter. What is particularly unique is its name—YeXi Lake, perhaps intentionally following the naming of West Lake. While it doesn't have the fame of the paradise in Suzhou and Hangzhou, the scenery is similar—"Except for Hangzhou, there is also YeXi Lake."
-        </div>
-    </div>
-    
-    <!-- 图标按钮容器 -->
-    <div class="icons-container" id="iconsContainer">
-        <!-- 咖啡按钮 -->
-        <div class="coffee-btn" id="coffeeBtn">
-            <svg viewBox="0 0 100 100">
-                <!-- 咖啡杯 -->
-                <defs>
-                    <linearGradient id="cupGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#8B4513" />
-                        <stop offset="100%" stop-color="#A0522D" />
-                    </linearGradient>
-                    <linearGradient id="coffeeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#6F4E37" />
-                        <stop offset="100%" stop-color="#8B5A2B" />
-                    </linearGradient>
-                </defs>
-                <!-- 杯子主体 -->
-                <ellipse cx="50" cy="70" rx="30" ry="10" fill="#D2B48C" />
-                <rect x="20" y="30" width="60" height="40" rx="5" ry="5" fill="url(#cupGradient)" />
-                <!-- 咖啡液体 -->
-                <rect x="25" y="35" width="50" height="30" rx="3" ry="3" fill="url(#coffeeGradient)" />
-                <!-- 杯柄 -->
-                <rect x="70" y="45" width="10" height="20" rx="3" ry="3" fill="url(#cupGradient)" />
-                <!-- 热气 -->
-                <path fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" d="M45,25 Q40,15 35,10" opacity="0.7"/>
-                <path fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" d="M50,25 Q50,15 50,5" opacity="0.7"/>
-                <path fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" d="M55,25 Q60,15 65,10" opacity="0.7"/>
-            </svg>
-        </div>
-        
-        <!-- 锁按钮 -->
-        <div class="lock-btn" id="lockBtn">
-            <svg viewBox="0 0 100 100">
-                <!-- 锁 -->
-                <defs>
-                    <linearGradient id="lockGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#cccccc" />
-                        <stop offset="100%" stop-color="#999999" />
-                    </linearGradient>
-                </defs>
-                <!-- 锁体 -->
-                <rect x="30" y="50" width="40" height="30" rx="5" ry="5" fill="url(#lockGradient)" />
-                <!-- 锁环 -->
-                <rect x="45" y="30" width="10" height="20" rx="3" ry="3" fill="url(#lockGradient)" />
-                <ellipse cx="50" cy="30" rx="15" ry="10" fill="url(#lockGradient)" />
-                <!-- 钥匙孔 -->
-                <circle cx="50" cy="60" r="5" fill="#333" />
-                <rect x="48" y="60" width="4" height="10" fill="#333" />
-            </svg>
-        </div>
-    </div>
-    
-    <!-- 密码输入模态框 -->
-    <div class="password-modal" id="passwordModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Enter 4-digit Password</h2>
-            <div class="password-inputs">
-                <input type="password" maxlength="1" class="password-digit" id="digit1" autocomplete="off">
-                <input type="password" maxlength="1" class="password-digit" id="digit2" autocomplete="off">
-                <input type="password" maxlength="1" class="password-digit" id="digit3" autocomplete="off">
-                <input type="password" maxlength="1" class="password-digit" id="digit4" autocomplete="off">
+</div>
+
+<!-- 图标区域 -->
+<div class="icon-area" id="iconArea">
+    <div class="coffee-btn" id="coffeeBtn">
+        <div class="coffee-icon">
+            <div class="coffee-cup">
+                <div class="coffee-liquid"></div>
             </div>
-            <p class="hint-text" id="hintText">Need a hint? <span>Maybe look for inspiration in the café?</span></p>
-            <div class="modal-buttons">
-                <button class="modal-btn back-btn" id="backBtn">Back</button>
-                <button class="modal-btn submit-btn" id="submitBtn">Submit</button>
-            </div>
+            <div class="coffee-handle"></div>
+            <div class="coffee-steam"></div>
+            <div class="coffee-steam"></div>
+            <div class="coffee-steam"></div>
         </div>
     </div>
 
-    <script>
-        // 背景图片和进度点元素
-        const bgImages = document.querySelectorAll('.bg-image');
-        const progressDots = document.querySelectorAll('.progress-dot');
-        const textContainer = document.getElementById('textContainer');
-        const introText = document.getElementById('introText');
-        const iconsContainer = document.getElementById('iconsContainer');
-        const coffeeBtn = document.getElementById('coffeeBtn');
-        const lockBtn = document.getElementById('lockBtn');
-        const passwordModal = document.getElementById('passwordModal');
-        const digitInputs = document.querySelectorAll('.password-digit');
-        const hintText = document.getElementById('hintText');
-        const backBtn = document.getElementById('backBtn');
-        const submitBtn = document.getElementById('submitBtn');
+    <div class="lock-btn" id="lockBtn">
+        <svg width="60" height="60" viewBox="0 0 100 100">
+            <rect x="30" y="50" width="40" height="30" rx="6" fill="#ddd"/>
+            <rect x="45" y="30" width="10" height="20" fill="#ddd"/>
+            <circle cx="50" cy="30" r="12" fill="#ddd"/>
+            <circle cx="50" cy="60" r="5" fill="#444"/>
+        </svg>
+    </div>
+</div>
+
+<!-- 密码弹窗 -->
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <h2>Enter 4‑digit Password</h2>
+        <div class="password-inputs">
+            <input type="text" maxlength="1" id="digit1">
+            <input type="text" maxlength="1" id="digit2">
+            <input type="text" maxlength="1" id="digit3">
+            <input type="text" maxlength="1" id="digit4">
+        </div>
+        <p class="hint" id="hint">Need a hint? <span>Maybe look for inspiration in the café?</span></p>
+        <div class="modal-actions">
+            <button class="back-btn" id="backBtn">Back</button>
+            <button class="submit-btn" id="submitBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 元素引用
+const bgs = document.querySelectorAll('.bg');
+const textParagraphs = document.querySelectorAll('#textBlock p');
+const textWrapper = document.getElementById('textWrapper');
+const iconArea = document.getElementById('iconArea');
+const modal = document.getElementById('modal');
+const digitInputs = document.querySelectorAll('.password-inputs input');
+const hint = document.getElementById('hint');
+const coffeeBtn = document.getElementById('coffeeBtn');
+const lockBtn = document.getElementById('lockBtn');
+const backBtn = document.getElementById('backBtn');
+const submitBtn = document.getElementById('submitBtn');
+
+// 背景轮播参数
+let currentBgIndex = 0;
+const bgCount = bgs.length;
+const bgDuration = 5000; // 每张背景显示5秒
+const textStartDelay = 1000; // 文字开始动画的延迟
+let slideUpAnimation = null;
+
+// 初始化
+function init() {
+    // 启动背景轮播
+    startBackgroundCarousel();
+    
+    // 设置密码验证功能
+    setupPasswordValidation();
+    
+    // 咖啡按钮点击事件
+    coffeeBtn.addEventListener('click', () => {
+        alert("The café is a cozy spot on campus. Have you noticed the password hint?");
+    });
+}
+
+// 背景轮播
+function startBackgroundCarousel() {
+    // 延迟后开始文字上滑动画
+    setTimeout(() => {
+        // 计算文字总高度，设置足够长的上滑距离
+        const textHeight = textWrapper.querySelector('.text-block').scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const slideDistance = textHeight + viewportHeight + 100; // 确保完全滑出
         
-        // 背景轮播参数
-        let currentBgIndex = 0;
-        const bgCount = bgImages.length;
-        const bgDuration = 5000; // 每张背景显示5秒
-        const textStartDelay = 1000; // 文字开始上滑的延迟
-        const textDuration = bgDuration * (bgCount - 1) - 3000; // 文字动画持续时间
+        textWrapper.style.animation = `slideUp ${(bgCount - 1) * bgDuration - 2000}ms linear forwards`;
         
-        // 文字介绍
-        const introContent = "YeXi Lake was built in the 1980s. At that time, the central area of the west campus of USTC was still a messy low-lying area. Teachers and students participated together in dredging and renovation, turning it into a garden landscape. There is an island in the lake, connected to the south bank by a wooden bridge called the Nine-Curve Bridge. A small pavilion stands on the island, named Yixin Pavilion. The northeast corner of the lake is Fanghua Garden. Tall metasequoia trees grow in YeXi Lake, and plum and peach trees are planted along the lakeside. Wild ducks come here to spend the winter. What is particularly unique is its name—YeXi Lake, perhaps intentionally following the naming of West Lake. While it doesn't have the fame of the paradise in Suzhou and Hangzhou, the scenery is similar—\"Except for Hangzhou, there is also YeXi Lake.\"";
-        
-        // 初始化文字
-        introText.textContent = introContent;
-        
-        // 背景轮播函数
-        function startBackgroundCarousel() {
-            // 更新进度指示器
-            function updateProgressIndicator(index) {
-                progressDots.forEach((dot, i) => {
-                    if (i === index) {
-                        dot.classList.add('progress-active');
-                    } else {
-                        dot.classList.remove('progress-active');
-                    }
-                });
+        // 逐行显示文字
+        let lineIndex = 0;
+        const showNextLine = () => {
+            if (lineIndex < textParagraphs.length) {
+                textParagraphs[lineIndex].classList.add('show');
+                lineIndex++;
+                setTimeout(showNextLine, 2000); // 每2秒显示一行
             }
+        };
+        setTimeout(showNextLine, 1000);
+    }, textStartDelay);
+    
+    // 背景切换
+    const bgInterval = setInterval(() => {
+        bgs[currentBgIndex].classList.remove('active');
+        currentBgIndex++;
+        
+        if (currentBgIndex < bgCount) {
+            bgs[currentBgIndex].classList.add('active');
             
-            // 切换背景图片
-            function changeBackground() {
-                // 隐藏当前背景
-                bgImages[currentBgIndex].classList.remove('bg-active');
-                
-                // 更新索引
-                currentBgIndex = (currentBgIndex + 1) % bgCount;
-                
-                // 显示新背景
-                bgImages[currentBgIndex].classList.add('bg-active');
-                
-                // 更新进度指示器
-                updateProgressIndicator(currentBgIndex);
-                
-                // 如果是最后一张背景，显示图标按钮
-                if (currentBgIndex === bgCount - 1) {
-                    setTimeout(() => {
-                        iconsContainer.classList.add('icons-visible');
-                    }, 1000);
-                }
-            }
-            
-            // 启动文字上滑动画
-            function startTextAnimation() {
-                // 计算文字上滑的总距离（文字高度 + 容器高度）
-                const textHeight = introText.offsetHeight;
-                const containerHeight = textContainer.offsetHeight;
-                const totalDistance = textHeight + containerHeight;
-                
-                // 设置动画持续时间
-                textContainer.style.transition = `transform ${textDuration}ms linear`;
-                textContainer.style.transform = `translateY(-${totalDistance}px)`;
-            }
-            
-            // 初始更新进度指示器
-            updateProgressIndicator(0);
-            
-            // 延迟后开始文字动画
-            setTimeout(startTextAnimation, textStartDelay);
-            
-            // 设置背景轮播定时器
-            const bgInterval = setInterval(changeBackground, bgDuration);
-            
-            // 最后一张背景后停止轮播
-            setTimeout(() => {
+            // 如果是最后一张背景，停止轮播并显示图标
+            if (currentBgIndex === bgCount - 1) {
                 clearInterval(bgInterval);
-            }, (bgCount - 1) * bgDuration);
-        }
-        
-        // 密码验证功能
-        function setupPasswordValidation() {
-            // 打开密码输入框
-            lockBtn.addEventListener('click', () => {
-                passwordModal.style.display = 'flex';
-            });
-            
-            // 关闭密码输入框
-            backBtn.addEventListener('click', () => {
-                passwordModal.style.display = 'none';
-                clearPasswordInputs();
-            });
-            
-            // 密码输入框逻辑
-            digitInputs.forEach((input, index) => {
-                input.addEventListener('input', (e) => {
-                    // 如果输入了数字，自动跳转到下一个输入框
-                    if (e.target.value.length === 1) {
-                        if (index < digitInputs.length - 1) {
-                            digitInputs[index + 1].focus();
-                        }
-                    }
-                });
-                
-                // 处理退格键
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
-                        digitInputs[index - 1].focus();
-                    }
-                });
-            });
-            
-            // 提交密码
-            submitBtn.addEventListener('click', checkPassword);
-            
-            // 回车键提交
-            digitInputs[digitInputs.length - 1].addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    checkPassword();
-                }
-            });
-        }
-        
-        // 检查密码
-        function checkPassword() {
-            const enteredPassword = Array.from(digitInputs)
-                .map(input => input.value)
-                .join('');
-            
-            // 正确密码是1958
-            if (enteredPassword === '1958') {
-                // 跳转到新网页（请替换为实际网址）
-                window.location.href = 'https://example.com/unlocked-page';
-            } else {
-                // 密码错误：清空输入框，显示提示
-                clearPasswordInputs();
-                
-                // 添加跳动动画
-                hintText.classList.add('hint-jump');
-                
-                // 动画结束后移除类，以便下次可以再次触发
                 setTimeout(() => {
-                    hintText.classList.remove('hint-jump');
-                }, 1000);
+                    iconArea.classList.add('visible');
+                }, 2000);
             }
+        } else {
+            clearInterval(bgInterval);
         }
-        
-        // 清空密码输入框
-        function clearPasswordInputs() {
-            digitInputs.forEach(input => {
-                input.value = '';
-            });
-            digitInputs[0].focus();
-        }
-        
-        // 咖啡按钮点击事件
-        coffeeBtn.addEventListener('click', () => {
-            // 这里可以添加咖啡按钮的功能
-            // 例如：显示咖啡厅信息或跳转到相关页面
-            alert("Coffee time! This could lead to a café page or show café information.");
+    }, bgDuration);
+}
+
+// 密码验证功能
+function setupPasswordValidation() {
+    // 打开密码输入框
+    lockBtn.addEventListener('click', () => {
+        modal.classList.add('active');
+        digitInputs[0].focus();
+    });
+    
+    // 关闭密码输入框
+    backBtn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        clearPasswordInputs();
+    });
+    
+    // 密码输入框逻辑
+    digitInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            // 只允许数字输入
+            input.value = input.value.replace(/\D/g, '');
+            
+            // 如果输入了数字，自动跳转到下一个输入框
+            if (e.target.value.length === 1) {
+                if (index < digitInputs.length - 1) {
+                    digitInputs[index + 1].focus();
+                }
+            }
         });
         
-        // 页面加载完成后启动
-        window.addEventListener('load', () => {
-            startBackgroundCarousel();
-            setupPasswordValidation();
+        // 处理退格键
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                digitInputs[index - 1].focus();
+            }
         });
-    </script>
+    });
+    
+    // 提交密码
+    submitBtn.addEventListener('click', checkPassword);
+    
+    // 回车键提交
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && modal.classList.contains('active')) {
+            checkPassword();
+        }
+    });
+}
+
+// 检查密码
+function checkPassword() {
+    const enteredPassword = Array.from(digitInputs)
+        .map(input => input.value)
+        .join('');
+    
+    // 正确密码是1958
+    if (enteredPassword === '1958') {
+        // 跳转到新网页
+        window.location.href = 'https://example.com/unlocked-page'; // 请替换为实际网址
+    } else {
+        // 密码错误：清空输入框，显示提示
+        clearPasswordInputs();
+        
+        // 添加跳动动画
+        hint.classList.add('jump');
+        
+        // 动画结束后移除类，以便下次可以再次触发
+        setTimeout(() => {
+            hint.classList.remove('jump');
+        }, 1200);
+    }
+}
+
+// 清空密码输入框
+function clearPasswordInputs() {
+    digitInputs.forEach(input => {
+        input.value = '';
+    });
+    digitInputs[0].focus();
+}
+
+// 页面加载完成后启动
+window.addEventListener('load', init);
+</script>
+
 </body>
 </html>
