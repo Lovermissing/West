@@ -56,21 +56,22 @@ body {
 .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.15);
     z-index: 2;
 }
 
 /* ===== 柳絮 ===== */
 .catkin {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background: linear-gradient(135deg, #a8e6a8, #c8e6c9);
     border-radius: 50%;
     filter: blur(1px);
-    opacity: 0.8;
-    animation: float 20s linear infinite;
+    opacity: 0.7;
+    animation: float 18s linear infinite;
     z-index: 3;
+    pointer-events: none;
 }
 
 @keyframes float {
@@ -79,10 +80,10 @@ body {
         opacity: 0;
     }
     10% {
-        opacity: 0.8;
+        opacity: 0.7;
     }
     90% {
-        opacity: 0.8;
+        opacity: 0.7;
     }
     100% {
         transform: translateY(-10vh) translateX(100px) rotate(360deg);
@@ -91,7 +92,7 @@ body {
 }
 
 /* ===== 文字容器 ===== */
-.text-master-container {
+.text-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -102,38 +103,40 @@ body {
     pointer-events: none;
 }
 
-.text-scroll-container {
+.text-scroll-wrapper {
     position: absolute;
-    top: 100%; /* 开始时完全在屏幕下方 */
+    top: 100vh; /* 从屏幕底部开始 */
     left: 0;
     width: 100%;
-    transition: top 120s linear; /* 更慢的滑动速度 */
+    height: auto;
+    will-change: transform;
 }
 
 .text-content {
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 0 20px;
     text-align: center;
 }
 
 .text-line {
-    font-size: 2rem;
-    line-height: 2.5;
-    letter-spacing: 0.1em;
+    font-size: 2.2rem;
+    line-height: 2.8;
+    letter-spacing: 0.12em;
     text-align: center;
     text-shadow: 
-        2px 2px 6px rgba(0, 0, 0, 0.8),
-        -1px -1px 3px rgba(255, 255, 255, 0.3);
+        3px 3px 8px rgba(0, 0, 0, 0.9),
+        -1px -1px 4px rgba(255, 255, 255, 0.4);
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 2s ease;
-    margin-bottom: 40px; /* 更大的行间距 */
-    min-height: 80px; /* 确保每行有足够高度 */
+    transform: translateY(30px);
+    transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 50px;
+    min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 0;
+    padding: 15px 0;
+    will-change: transform, opacity;
 }
 
 .text-line.show {
@@ -141,10 +144,14 @@ body {
     transform: translateY(0);
 }
 
-/* 确保文字在每张背景开始时都从屏幕最下方出现 */
-.text-line.entering {
-    position: relative;
-    top: calc(100vh - 100px); /* 从屏幕底部开始 */
+/* 文字滑动动画 */
+@keyframes slideUp {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(calc(-100vh - 2000px)); /* 确保完全滑出屏幕 */
+    }
 }
 
 /* ===== 图标按钮 ===== */
@@ -222,101 +229,111 @@ body {
         inset 0 2px 15px rgba(255, 255, 255, 0.3);
 }
 
-/* 咖啡图标 - 45度俯视角 */
+/* 咖啡图标 - 45度俯视角（观察者俯视） */
 .coffee-icon {
-    position: relative;
     width: 80px;
     height: 80px;
-    transform: rotate(45deg) perspective(300px) rotateX(10deg);
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 1000px;
 }
 
+/* 咖啡杯（从上往下看的椭圆形） */
+.coffee-cup-outer {
+    position: absolute;
+    width: 70px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 35px 35px 20px 20px;
+    bottom: 5px;
+    left: 5px;
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.2),
+        inset 0 2px 10px rgba(0, 0, 0, 0.1);
+    transform: perspective(300px) rotateX(20deg);
+}
+
+/* 杯内液体（从上往下看） */
+.coffee-liquid {
+    position: absolute;
+    width: 60px;
+    height: 35px;
+    background: linear-gradient(135deg, #6f4e37, #8b5a2b);
+    border-radius: 30px 30px 15px 15px;
+    bottom: 10px;
+    left: 10px;
+    box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.3);
+    transform: perspective(300px) rotateX(20deg);
+}
+
+/* 杯柄（俯视角能看到的部分） */
+.coffee-handle {
+    position: absolute;
+    right: -5px;
+    top: 15px;
+    width: 20px;
+    height: 30px;
+    border: 8px solid rgba(255, 255, 255, 0.9);
+    border-left: none;
+    border-radius: 0 15px 15px 0;
+    box-shadow: 
+        3px 0 8px rgba(0, 0, 0, 0.2),
+        inset 2px 0 5px rgba(0, 0, 0, 0.1);
+    transform: perspective(300px) rotateX(20deg) rotateY(-10deg);
+}
+
+/* 杯托（俯视角的圆形） */
 .coffee-saucer {
     position: absolute;
     width: 100px;
     height: 25px;
-    background: linear-gradient(145deg, #f8f8f8, #e0e0e0);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
-    bottom: 5px;
+    bottom: -5px;
     left: -10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transform: perspective(300px) rotateX(20deg);
 }
 
-.coffee-cup {
-    position: absolute;
-    width: 70px;
-    height: 60px;
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    border-radius: 5px 5px 20px 20px;
-    bottom: 20px;
-    left: 5px;
-    box-shadow: 
-        2px 2px 10px rgba(0, 0, 0, 0.2),
-        inset 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.coffee-liquid {
-    position: absolute;
-    top: 10px;
-    left: 5px;
-    right: 5px;
-    height: 40px;
-    background: linear-gradient(to bottom, #6f4e37, #8b5a2b);
-    border-radius: 3px 3px 15px 15px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-.coffee-handle {
-    position: absolute;
-    right: -12px;
-    top: 20px;
-    width: 20px;
-    height: 35px;
-    border: 8px solid #ffffff;
-    border-left: none;
-    border-radius: 0 15px 15px 0;
-    box-shadow: 
-        2px 0 5px rgba(0, 0, 0, 0.2),
-        inset 2px 0 5px rgba(0, 0, 0, 0.1);
-}
-
+/* 蒸汽 */
 .coffee-steam {
     position: absolute;
     width: 4px;
     background: rgba(255, 255, 255, 0.7);
     border-radius: 2px;
-    animation: steam-rise 4s ease-in-out infinite;
+    animation: steam-rise 3s ease-in-out infinite;
+    filter: blur(0.5px);
 }
 
 .coffee-steam:nth-child(1) {
-    height: 30px;
-    top: -25px;
-    left: 25px;
+    height: 25px;
+    top: -20px;
+    left: 20px;
     animation-delay: 0s;
 }
 
 .coffee-steam:nth-child(2) {
-    height: 25px;
-    top: -20px;
+    height: 20px;
+    top: -15px;
     left: 40px;
-    animation-delay: 0.5s;
+    animation-delay: 0.4s;
 }
 
 .coffee-steam:nth-child(3) {
-    height: 20px;
-    top: -15px;
-    left: 15px;
-    animation-delay: 1s;
+    height: 15px;
+    top: -10px;
+    left: 10px;
+    animation-delay: 0.8s;
 }
 
 @keyframes steam-rise {
     0%, 100% { 
         opacity: 0; 
-        transform: translateY(0) scale(1);
+        transform: translateY(0) scale(0.8);
     }
     50% { 
         opacity: 0.8; 
-        transform: translateY(-15px) scale(1.1);
+        transform: translateY(-12px) scale(1);
     }
 }
 
@@ -330,12 +347,12 @@ body {
 .modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 20;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
 }
 
 .modal.active {
@@ -353,6 +370,19 @@ body {
         0 20px 50px rgba(0, 0, 0, 0.4),
         inset 0 2px 20px rgba(255, 255, 255, 0.3);
     border: 2px solid rgba(255, 255, 255, 0.5);
+    transform: translateY(0);
+    animation: modalAppear 0.5s ease;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-box h2 {
@@ -360,6 +390,7 @@ body {
     font-size: 2rem;
     color: #2e7d32;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
 }
 
 .password-inputs {
@@ -373,6 +404,7 @@ body {
     width: 65px;
     height: 80px;
     font-size: 2.4rem;
+    font-family: 'Courier New', monospace;
     text-align: center;
     border: 3px solid #81c784;
     border-radius: 12px;
@@ -398,6 +430,7 @@ body {
     background: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
     color: #558b2f;
+    transition: all 0.3s;
 }
 
 .hint span {
@@ -424,6 +457,7 @@ body {
     min-width: 120px;
     font-weight: bold;
     letter-spacing: 1px;
+    font-family: 'Cambria', serif;
 }
 
 .back-btn {
@@ -459,16 +493,17 @@ body {
 }
 
 .hint.jump {
-    animation: hintJump 0.8s ease 2;
+    animation: hintJump 0.7s ease 2;
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
     .text-line {
-        font-size: 1.6rem;
+        font-size: 1.7rem;
         line-height: 2.2;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
         min-height: 60px;
+        letter-spacing: 0.08em;
     }
     
     .modal-box {
@@ -493,6 +528,10 @@ body {
     .lock-btn:hover {
         transform: scale(1.05);
     }
+    
+    .coffee-icon {
+        transform: scale(0.9);
+    }
 }
 </style>
 </head>
@@ -513,7 +552,7 @@ body {
 <!-- 柳絮 -->
 <script>
 // 创建绿色柳絮
-for (let i = 0; i < 20; i++) {
+for (let i = 0; i < 18; i++) {
     const catkin = document.createElement('div');
     catkin.className = 'catkin';
     
@@ -521,29 +560,25 @@ for (let i = 0; i < 20; i++) {
     catkin.style.left = Math.random() * 100 + '%';
     
     // 随机大小
-    const size = 6 + Math.random() * 8;
+    const size = 4 + Math.random() * 6;
     catkin.style.width = size + 'px';
     catkin.style.height = size + 'px';
     
     // 随机动画时长
-    const duration = 15 + Math.random() * 20;
+    const duration = 12 + Math.random() * 15;
     catkin.style.animationDuration = duration + 's';
-    catkin.style.animationDelay = Math.random() * 15 + 's';
+    catkin.style.animationDelay = Math.random() * 10 + 's';
     
     // 随机透明度
-    catkin.style.opacity = 0.5 + Math.random() * 0.5;
-    
-    // 随机颜色偏移
-    const hue = 120 + (Math.random() * 20 - 10); // 绿色系
-    catkin.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 75%), hsl(${hue}, 60%, 85%))`;
+    catkin.style.opacity = 0.4 + Math.random() * 0.4;
     
     document.body.appendChild(catkin);
 }
 </script>
 
 <!-- 文字内容 -->
-<div class="text-master-container">
-    <div class="text-scroll-container" id="textScrollContainer">
+<div class="text-container" id="textContainer">
+    <div class="text-scroll-wrapper" id="textScrollWrapper">
         <div class="text-content" id="textContent">
             <div class="text-line" id="line1">YeXi Lake was built in the 1980s.</div>
             <div class="text-line" id="line2">At that time, the central area of the west campus of USTC was still a messy low-lying area.</div>
@@ -566,9 +601,8 @@ for (let i = 0; i < 20; i++) {
     <div class="coffee-btn" id="coffeeBtn">
         <div class="coffee-icon">
             <div class="coffee-saucer"></div>
-            <div class="coffee-cup">
-                <div class="coffee-liquid"></div>
-            </div>
+            <div class="coffee-cup-outer"></div>
+            <div class="coffee-liquid"></div>
             <div class="coffee-handle"></div>
             <div class="coffee-steam"></div>
             <div class="coffee-steam"></div>
@@ -597,10 +631,10 @@ for (let i = 0; i < 20; i++) {
     <div class="modal-box">
         <h2>Enter 4‑digit Password</h2>
         <div class="password-inputs">
-            <input type="text" maxlength="1" id="digit1" autocomplete="off">
-            <input type="text" maxlength="1" id="digit2" autocomplete="off">
-            <input type="text" maxlength="1" id="digit3" autocomplete="off">
-            <input type="text" maxlength="1" id="digit4" autocomplete="off">
+            <input type="text" maxlength="1" id="digit1" autocomplete="off" inputmode="numeric">
+            <input type="text" maxlength="1" id="digit2" autocomplete="off" inputmode="numeric">
+            <input type="text" maxlength="1" id="digit3" autocomplete="off" inputmode="numeric">
+            <input type="text" maxlength="1" id="digit4" autocomplete="off" inputmode="numeric">
         </div>
         <p class="hint" id="hint">Need a hint? <span>Maybe look for inspiration in the café?</span></p>
         <div class="modal-actions">
@@ -614,7 +648,8 @@ for (let i = 0; i < 20; i++) {
 // 元素引用
 const bgs = document.querySelectorAll('.bg');
 const textLines = document.querySelectorAll('.text-line');
-const textScrollContainer = document.getElementById('textScrollContainer');
+const textScrollWrapper = document.getElementById('textScrollWrapper');
+const textContainer = document.getElementById('textContainer');
 const iconArea = document.getElementById('iconArea');
 const modal = document.getElementById('modal');
 const digitInputs = document.querySelectorAll('.password-inputs input');
@@ -624,16 +659,18 @@ const lockBtn = document.getElementById('lockBtn');
 const backBtn = document.getElementById('backBtn');
 const submitBtn = document.getElementById('submitBtn');
 
-// 背景轮播参数
+// 参数设置
 let currentBgIndex = 0;
 const bgCount = bgs.length;
-const bgDuration = 7000; // 每张背景显示7秒（比以前慢）
-const textScrollDuration = 120000; // 文字总滑动时间：120秒
+const bgDuration = 6000; // 每张背景6秒
+const totalTextDuration = (bgCount - 1) * bgDuration; // 文字动画总时长 = 背景切换总时间
+let textAnimation = null;
+let bgInterval = null;
 
 // 初始化
 function init() {
-    // 重置文字容器位置
-    textScrollContainer.style.top = '100%'; // 从屏幕底部开始
+    // 重置初始位置
+    textScrollWrapper.style.transform = 'translateY(0)';
     
     // 启动背景轮播
     startBackgroundCarousel();
@@ -652,7 +689,7 @@ function init() {
 
 // 背景轮播
 function startBackgroundCarousel() {
-    const bgInterval = setInterval(() => {
+    bgInterval = setInterval(() => {
         bgs[currentBgIndex].classList.remove('active');
         currentBgIndex++;
         
@@ -664,7 +701,7 @@ function startBackgroundCarousel() {
                 clearInterval(bgInterval);
                 setTimeout(() => {
                     iconArea.classList.add('visible');
-                }, 3000);
+                }, 2000);
             }
         } else {
             clearInterval(bgInterval);
@@ -674,35 +711,44 @@ function startBackgroundCarousel() {
 
 // 文字动画
 function startTextAnimation() {
-    // 计算总滑动距离
-    const textContainerHeight = textScrollContainer.scrollHeight;
+    // 计算文字总高度和滑动距离
+    const textContentHeight = document.getElementById('textContent').scrollHeight;
     const viewportHeight = window.innerHeight;
-    const totalScrollDistance = textContainerHeight + viewportHeight;
+    const totalScrollDistance = textContentHeight + viewportHeight;
     
-    // 设置滑动动画
+    // 延迟1秒后开始文字动画
     setTimeout(() => {
-        // 缓慢上滑
-        textScrollContainer.style.transition = `top ${textScrollDuration}ms linear`;
-        textScrollContainer.style.top = `-${totalScrollDistance}px`;
+        // 开始滑动
+        textScrollWrapper.style.transition = `transform ${totalTextDuration}ms linear`;
+        textScrollWrapper.style.transform = `translateY(-${totalScrollDistance}px)`;
+        
+        // 开始逐行显示文字
+        startLineReveal();
     }, 1000);
+}
+
+// 逐行显示文字
+function startLineReveal() {
+    const lineCount = textLines.length;
+    const revealInterval = totalTextDuration / lineCount; // 每行显示的时间间隔
     
-    // 逐行显示文字
     let lineIndex = 0;
-    const showNextLine = () => {
-        if (lineIndex < textLines.length) {
-            // 确保每行文字在显示时都在相同位置
+    
+    function showNextLine() {
+        if (lineIndex < lineCount) {
             textLines[lineIndex].classList.add('show');
             lineIndex++;
             
-            // 控制行显示速度，大约每6秒显示一行
-            if (lineIndex < textLines.length) {
-                setTimeout(showNextLine, 6000);
+            if (lineIndex < lineCount) {
+                setTimeout(showNextLine, revealInterval);
             }
         }
-    };
+    }
     
-    // 延迟1秒后开始显示第一行
-    setTimeout(showNextLine, 1000);
+    // 延迟一下开始
+    setTimeout(() => {
+        showNextLine();
+    }, 500);
 }
 
 // 密码验证功能
@@ -719,6 +765,14 @@ function setupPasswordValidation() {
     backBtn.addEventListener('click', () => {
         modal.classList.remove('active');
         clearPasswordInputs();
+    });
+    
+    // 点击模态框外部关闭
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('active');
+            clearPasswordInputs();
+        }
     });
     
     // 密码输入框逻辑
@@ -751,6 +805,20 @@ function setupPasswordValidation() {
                 digitInputs[index + 1].focus();
                 e.preventDefault();
             }
+            
+            // 复制/粘贴限制
+            if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+                setTimeout(() => {
+                    const pasted = input.value;
+                    if (pasted.length > 1) {
+                        const digits = pasted.replace(/\D/g, '').slice(0, 4);
+                        for (let i = 0; i < Math.min(digits.length, 4); i++) {
+                            digitInputs[i].value = digits[i];
+                        }
+                        digitInputs[Math.min(digits.length, 3)].focus();
+                    }
+                }, 0);
+            }
         });
     });
     
@@ -782,10 +850,10 @@ function checkPassword() {
         // 添加跳动动画
         hint.classList.add('jump');
         
-        // 动画结束后移除类，以便下次可以再次触发
+        // 动画结束后移除类
         setTimeout(() => {
             hint.classList.remove('jump');
-        }, 1600);
+        }, 1400);
     }
 }
 
@@ -802,23 +870,31 @@ function clearPasswordInputs() {
 // 页面加载完成后启动
 window.addEventListener('load', init);
 
-// 窗口大小变化时重新计算位置
+// 窗口大小变化时重新计算
+let resizeTimeout;
 window.addEventListener('resize', () => {
-    // 停止当前动画
-    textScrollContainer.style.transition = 'none';
-    
-    // 重置位置
-    textScrollContainer.style.top = '100%';
-    
-    // 重新计算并开始动画
-    setTimeout(() => {
-        const textContainerHeight = textScrollContainer.scrollHeight;
-        const viewportHeight = window.innerHeight;
-        const totalScrollDistance = textContainerHeight + viewportHeight;
-        
-        textScrollContainer.style.transition = `top ${textScrollDuration}ms linear`;
-        textScrollContainer.style.top = `-${totalScrollDistance}px`;
-    }, 100);
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        // 重置动画
+        if (textScrollWrapper.style.transition) {
+            textScrollWrapper.style.transition = 'none';
+            
+            // 重新计算距离
+            const textContentHeight = document.getElementById('textContent').scrollHeight;
+            const viewportHeight = window.innerHeight;
+            const totalScrollDistance = textContentHeight + viewportHeight;
+            const progress = currentBgIndex / (bgCount - 1);
+            const currentDistance = totalScrollDistance * progress;
+            
+            textScrollWrapper.style.transform = `translateY(-${currentDistance}px)`;
+            
+            // 重新开始动画
+            setTimeout(() => {
+                textScrollWrapper.style.transition = `transform ${totalTextDuration * (1 - progress)}ms linear`;
+                textScrollWrapper.style.transform = `translateY(-${totalScrollDistance}px)`;
+            }, 50);
+        }
+    }, 250);
 });
 </script>
 
