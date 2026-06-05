@@ -101,6 +101,12 @@ body {
     overflow: hidden;
     z-index: 4;
     pointer-events: none;
+    opacity: 1;
+    transition: opacity 3s ease-in-out; /* 添加淡出过渡 */
+}
+
+.text-master-container.fade-out {
+    opacity: 0; /* 淡出效果 */
 }
 
 .text-scroll-container {
@@ -500,7 +506,7 @@ for (let i = 0; i < 18; i++) {
 </script>
 
 <!-- 文字内容 -->
-<div class="text-master-container">
+<div class="text-master-container" id="textMasterContainer">
     <div class="text-scroll-container" id="textScrollContainer">
         <div class="text-content" id="textContent">
             <div class="text-line" id="line1">YeXi Lake was built in the 1980s.</div>
@@ -565,6 +571,7 @@ const bgs = document.querySelectorAll('.bg');
 const textLines = document.querySelectorAll('.text-line');
 const textScrollContainer = document.getElementById('textScrollContainer');
 const textContent = document.getElementById('textContent');
+const textMasterContainer = document.getElementById('textMasterContainer');
 const iconArea = document.getElementById('iconArea');
 const modal = document.getElementById('modal');
 const digitInputs = document.querySelectorAll('.password-inputs input');
@@ -581,6 +588,7 @@ const bgCount = bgs.length;
 const bgDuration = 6000; // 每张背景6秒
 const totalTextDuration = 30000; // 文字动画总时长30秒
 let bgInterval = null;
+let isTextFadingOut = false;
 
 // 图片加载错误处理
 if (coffeeImg) {
@@ -651,6 +659,11 @@ function startBackgroundCarousel() {
         if (currentBgIndex < bgCount) {
             bgs[currentBgIndex].classList.add('active');
             
+            // 如果是倒数第二张背景（第5张），开始淡出文字
+            if (currentBgIndex === bgCount - 2 && !isTextFadingOut) {
+                fadeOutText();
+            }
+            
             // 如果是最后一张背景，停止轮播并显示图标
             if (currentBgIndex === bgCount - 1) {
                 clearInterval(bgInterval);
@@ -662,6 +675,29 @@ function startBackgroundCarousel() {
             clearInterval(bgInterval);
         }
     }, bgDuration);
+}
+
+// 淡出文字
+function fadeOutText() {
+    if (isTextFadingOut) return;
+    isTextFadingOut = true;
+    
+    // 开始淡出整个文字容器
+    textMasterContainer.classList.add('fade-out');
+    
+    // 同时让每行文字逐个淡出
+    textLines.forEach((line, index) => {
+        setTimeout(() => {
+            line.style.transition = 'opacity 1.5s ease, transform 1.5s ease';
+            line.style.opacity = '0';
+            line.style.transform = 'translateY(-20px)';
+        }, index * 200); // 每行淡出间隔200ms
+    });
+    
+    // 确保文字完全消失
+    setTimeout(() => {
+        textMasterContainer.style.display = 'none';
+    }, 3000);
 }
 
 // 文字动画
@@ -685,7 +721,7 @@ function startTextAnimation() {
 // 逐行显示文字
 function startLineReveal() {
     const lineCount = textLines.length;
-    const revealInterval = totalTextDuration / lineCount; // 每行显示的时间间隔
+    const revealInterval = 2500; // 每行显示的时间间隔2.5秒
     
     let lineIndex = 0;
     
