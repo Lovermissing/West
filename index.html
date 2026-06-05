@@ -107,6 +107,7 @@ body {
 
 .text-master-container.fade-out {
     opacity: 0; /* 淡出效果 */
+    pointer-events: none;
 }
 
 .text-scroll-container {
@@ -115,7 +116,7 @@ body {
     left: 0;
     width: 100%;
     height: auto;
-    animation: slideUp 30s linear forwards; /* 30秒滑动时间 */
+    animation: slideUp 40s linear forwards; /* 延长到40秒确保完全显示 */
     animation-delay: 1s; /* 延迟1秒开始 */
 }
 
@@ -124,7 +125,7 @@ body {
         transform: translateY(0);
     }
     100% {
-        transform: translateY(calc(-100vh - 2000px)); /* 确保完全滑出屏幕 */
+        transform: translateY(calc(-100vh - 3000px)); /* 确保完全滑出屏幕 */
     }
 }
 
@@ -145,7 +146,7 @@ body {
         -1px -1px 4px rgba(255, 255, 255, 0.4);
     opacity: 0;
     transform: translateY(100px); /* 从下方进入 */
-    transition: all 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all 2.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     margin-bottom: 50px;
     min-height: 80px;
     display: flex;
@@ -586,7 +587,7 @@ const coffeeImg = document.querySelector('.coffee-img');
 let currentBgIndex = 0;
 const bgCount = bgs.length;
 const bgDuration = 6000; // 每张背景6秒
-const totalTextDuration = 30000; // 文字动画总时长30秒
+const totalTextDuration = 40000; // 文字动画总时长延长到40秒
 let bgInterval = null;
 let isTextFadingOut = false;
 
@@ -644,9 +645,9 @@ function positionLinesAtBottom() {
         
         // 设置进入动画
         setTimeout(() => {
-            line.style.transition = 'all 2.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            line.style.transition = 'all 2.8s cubic-bezier(0.2, 0.8, 0.2, 1)';
             line.style.top = '0';
-        }, index * 2500); // 每行间隔2.5秒
+        }, index * 3000); // 每行间隔3秒
     });
 }
 
@@ -659,14 +660,15 @@ function startBackgroundCarousel() {
         if (currentBgIndex < bgCount) {
             bgs[currentBgIndex].classList.add('active');
             
-            // 如果是倒数第二张背景（第5张），开始淡出文字
-            if (currentBgIndex === bgCount - 2 && !isTextFadingOut) {
+            // 如果是最后一张背景，开始淡出文字
+            if (currentBgIndex === bgCount - 1 && !isTextFadingOut) {
                 fadeOutText();
             }
             
-            // 如果是最后一张背景，停止轮播并显示图标
+            // 如果是最后一张背景，停止轮播
             if (currentBgIndex === bgCount - 1) {
                 clearInterval(bgInterval);
+                // 延迟2秒后显示图标
                 setTimeout(() => {
                     iconArea.classList.add('visible');
                 }, 2000);
@@ -688,15 +690,15 @@ function fadeOutText() {
     // 同时让每行文字逐个淡出
     textLines.forEach((line, index) => {
         setTimeout(() => {
-            line.style.transition = 'opacity 1.5s ease, transform 1.5s ease';
+            line.style.transition = 'opacity 2s ease, transform 2s ease';
             line.style.opacity = '0';
             line.style.transform = 'translateY(-20px)';
-        }, index * 200); // 每行淡出间隔200ms
+        }, index * 150); // 每行淡出间隔150ms
     });
     
     // 确保文字完全消失
     setTimeout(() => {
-        textMasterContainer.style.display = 'none';
+        textMasterContainer.style.pointerEvents = 'none';
     }, 3000);
 }
 
@@ -707,7 +709,7 @@ function startTextAnimation() {
         // 计算总滑动距离
         const textContentHeight = textContent.scrollHeight;
         const viewportHeight = window.innerHeight;
-        const totalScrollDistance = textContentHeight + viewportHeight + 500; // 额外距离确保完全滑出
+        const totalScrollDistance = textContentHeight + viewportHeight + 1000; // 额外距离确保完全显示
         
         // 开始逐行显示文字
         startLineReveal();
@@ -721,7 +723,7 @@ function startTextAnimation() {
 // 逐行显示文字
 function startLineReveal() {
     const lineCount = textLines.length;
-    const revealInterval = 2500; // 每行显示的时间间隔2.5秒
+    const revealInterval = 3000; // 每行显示的时间间隔3秒
     
     let lineIndex = 0;
     
