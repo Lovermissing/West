@@ -469,12 +469,12 @@ body {
 <body>
 
 <div class="bg-container">
-    <div class="bg active" id="bg1"></div>
+    <div class="bg" id="bg1"></div>
     <div class="bg" id="bg2"></div>
     <div class="bg" id="bg3"></div>
     <div class="bg" id="bg4"></div>
     <div class="bg" id="bg5"></div>
-    <div class="bg" id="bg6"></div>
+    <div class="bg active" id="bg6"></div> <!-- 默认显示最后一张背景 -->
 </div>
 
 <div class="overlay"></div>
@@ -506,8 +506,8 @@ for (let i = 0; i < 18; i++) {
 }
 </script>
 
-<!-- 文字内容 -->
-<div class="text-master-container" id="textMasterContainer">
+<!-- 文字内容 - 默认隐藏 -->
+<div class="text-master-container" id="textMasterContainer" style="display: none;">
     <div class="text-scroll-container" id="textScrollContainer">
         <div class="text-content" id="textContent">
             <div class="text-line" id="line1">YeXi Lake was built in the 1980s.</div>
@@ -526,8 +526,8 @@ for (let i = 0; i < 18; i++) {
     </div>
 </div>
 
-<!-- 图标区域 -->
-<div class="icon-area" id="iconArea">
+<!-- 图标区域 - 默认显示 -->
+<div class="icon-area visible" id="iconArea">
     <div class="coffee-btn" id="coffeeBtn">
         <img src="images/coffee.jpg" alt="Coffee" class="coffee-img" onerror="this.style.display='none';this.parentElement.innerHTML='☕';">
     </div>
@@ -583,6 +583,9 @@ const backBtn = document.getElementById('backBtn');
 const submitBtn = document.getElementById('submitBtn');
 const coffeeImg = document.querySelector('.coffee-img');
 
+// 检查是否从咖啡厅页面返回
+const isReturningFromCafe = sessionStorage.getItem('fromCafePage') === 'true';
+
 // 参数设置
 let currentBgIndex = 0;
 const bgCount = bgs.length;
@@ -611,7 +614,61 @@ if (coffeeImg) {
 
 // 初始化
 function init() {
-    // 设置文字初始位置 - 确保从屏幕底部开始
+    if (isReturningFromCafe) {
+        // 如果是从咖啡厅页面返回，直接显示最终状态
+        showFinalState();
+        
+        // 清除标记
+        sessionStorage.removeItem('fromCafePage');
+    } else {
+        // 正常流程，从第一张背景开始
+        showNormalFlow();
+    }
+    
+    // 设置密码验证功能
+    setupPasswordValidation();
+    
+    // 咖啡按钮点击事件
+    coffeeBtn.addEventListener('click', () => {
+        // 设置标记，表示要去咖啡厅页面
+        sessionStorage.setItem('fromCafePage', 'true');
+        // 跳转到咖啡厅页面
+        window.location.href = 'https://lovermissing.github.io/coffee/';
+    });
+}
+
+// 显示最终状态（从咖啡厅返回时）
+function showFinalState() {
+    // 直接显示最后一张背景
+    bgs[5].classList.add('active');
+    
+    // 隐藏文字容器
+    textMasterContainer.style.display = 'none';
+    
+    // 立即显示图标区域
+    iconArea.classList.add('visible');
+}
+
+// 正常显示流程
+function showNormalFlow() {
+    // 重置到第一张背景
+    bgs.forEach((bg, index) => {
+        if (index === 0) {
+            bg.classList.add('active');
+        } else {
+            bg.classList.remove('active');
+        }
+    });
+    
+    currentBgIndex = 0;
+    
+    // 显示文字容器
+    textMasterContainer.style.display = 'block';
+    
+    // 隐藏图标区域
+    iconArea.classList.remove('visible');
+    
+    // 设置文字初始位置
     setTimeout(() => {
         positionLinesAtBottom();
     }, 100);
@@ -621,14 +678,6 @@ function init() {
     
     // 启动文字动画
     startTextAnimation();
-    
-    // 设置密码验证功能
-    setupPasswordValidation();
-    
-    // 咖啡按钮点击事件
-    coffeeBtn.addEventListener('click', () => {
-        alert("A quiet café on campus... Maybe the password is related to a special year?");
-    });
 }
 
 // 将每行文字定位到屏幕底部
@@ -868,8 +917,10 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        // 重置文字位置
-        positionLinesAtBottom();
+        if (!isReturningFromCafe) {
+            // 只有正常流程才需要重置文字位置
+            positionLinesAtBottom();
+        }
     }, 250);
 });
 </script>
